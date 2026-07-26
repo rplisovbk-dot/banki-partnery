@@ -642,8 +642,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 
   // ---------- yandex disk sync ----------
   var YANDEX_CLIENT_ID = 'cd764f1b5bf64075b2e37048e1694e42';
-  var YANDEX_DISK_PATH = 'app:/banki-partnery-data.json';
-  var YANDEX_API = 'https://cloud-api.yandex.net/v1/disk';
+  // Yandex Disk's file-content endpoints don't send CORS headers, so the browser can't read
+  // them directly (confirmed: "blocked by CORS policy" on downloader.disk.yandex.ru). This
+  // proxy — a small Yandex Cloud Function — relays the calls server-side and adds CORS itself.
+  var YANDEX_PROXY_URL = 'https://functions.yandexcloud.net/d4e3apq5a8uo79h7hueu';
   var YANDEX_TOKEN_KEY = 'yandex_disk_token';
 
   var yandexToken = '';
@@ -677,34 +679,29 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     text.textContent = labels[yandexSyncState] || 'Синхронизация';
   }
 
-  function yandexApiFetch(url) {
-    return fetch(url, { headers: { 'Authorization': 'OAuth ' + yandexToken, 'Accept': 'application/json' } });
-  }
-
   function yandexDownload() {
-    return yandexApiFetch(YANDEX_API + '/resources/download?path=' + encodeURIComponent(YANDEX_DISK_PATH)).then(function (res) {
+    return fetch(YANDEX_PROXY_URL, {
+      method: 'GET',
+      headers: { 'Authorization': 'OAuth ' + yandexToken }
+    }).then(function (res) {
       if (res.status === 404) return { found: false };
       if (res.status === 401) { var e = new Error('unauthorized'); e.code = 401; throw e; }
-      if (!res.ok) throw new Error('download-link ' + res.status);
-      return res.json().then(function (linkInfo) {
-        return fetch(linkInfo.href).then(function (fileRes) {
-          if (!fileRes.ok) throw new Error('file-fetch ' + fileRes.status);
-          return fileRes.json();
-        }).then(function (data) { return { found: true, data: data }; });
-      });
+      if (!res.ok) throw new Error('proxy-download ' + res.status);
+      return res.json().then(function (data) { return { found: true, data: data }; });
     });
   }
 
   function yandexUpload(banksData) {
-    return yandexApiFetch(YANDEX_API + '/resources/upload?overwrite=true&path=' + encodeURIComponent(YANDEX_DISK_PATH)).then(function (res) {
+    return fetch(YANDEX_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Authorization': 'OAuth ' + yandexToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify(banksData)
+    }).then(function (res) {
       if (res.status === 401) { var e = new Error('unauthorized'); e.code = 401; throw e; }
-      if (!res.ok) throw new Error('upload-link ' + res.status);
+      if (!res.ok) throw new Error('proxy-upload ' + res.status);
       return res.json();
-    }).then(function (linkInfo) {
-      var blob = new Blob([JSON.stringify(banksData)], { type: 'application/json' });
-      return fetch(linkInfo.href, { method: linkInfo.method || 'PUT', body: blob });
-    }).then(function (putRes) {
-      if (!putRes.ok) throw new Error('upload-put ' + putRes.status);
+    }).then(function (result) {
+      if (!result || !result.ok) throw new Error('proxy-upload-failed');
       return true;
     });
   }
