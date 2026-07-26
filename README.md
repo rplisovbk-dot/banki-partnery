@@ -1,0 +1,1364 @@
+[index.html.html](https://github.com/user-attachments/files/30394946/index.html.html)
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>База банков-партнёров</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;600;700;800&family=Golos+Text:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #f4f8f5;
+  --surface: #ffffff;
+  --surface-2: #eef4f0;
+  --surface-3: #e3ebe5;
+  --border: #dfe8e1;
+  --border-soft: #ecf1ee;
+  --text: #16211a;
+  --text-dim: #667369;
+  --text-faint: #97a49b;
+  --accent: #1e9b5c;
+  --accent-ink: #ffffff;
+  --teal: #1c8f96;
+  --red: #d64f4f;
+  --radius: 22px;
+  --radius-sm: 13px;
+  --shadow-card: 0 4px 20px rgba(23, 41, 31, 0.07);
+  --shadow-modal: 0 24px 60px rgba(23, 41, 31, 0.18);
+  --font-display: 'Unbounded', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-body: 'Golos Text', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { background: var(--bg); margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input, select, textarea { font-family: inherit; color: inherit; }
+
+a { color: inherit; text-decoration: none; }
+
+/* ---------- loading ---------- */
+.loading {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--text-dim);
+  font-size: 14px;
+}
+.spin { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- layout ---------- */
+#app { max-width: 1180px; margin: 0 auto; padding: 28px 20px 64px; }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+.header__brand { display: flex; align-items: center; gap: 14px; }
+.header__mark {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 18px;
+  font-family: var(--font-display);
+  flex-shrink: 0;
+  box-shadow: 0 6px 16px rgba(30, 155, 92, 0.28);
+}
+.header h1 { font-family: var(--font-display); font-size: 21px; font-weight: 600; margin: 0 0 3px; letter-spacing: -0.01em; color: var(--text); }
+.header__sub { margin: 0; font-size: 13px; color: var(--text-dim); }
+.header__stats {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 8px 13px;
+  border-radius: var(--radius-sm);
+}
+.header__right { display: flex; align-items: center; gap: 10px; }
+.sync-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.sync-badge:hover { background: var(--surface-2); }
+.sync-badge--connected { color: var(--teal); border-color: var(--teal); background: #eaf6f5; }
+.sync-badge--syncing { color: var(--accent); border-color: var(--accent); background: #eaf7f0; }
+.sync-badge--error { color: var(--red); border-color: var(--red); background: #fdeeee; }
+.sync-modal__text { font-size: 13.5px; color: var(--text-dim); line-height: 1.55; margin-bottom: 14px; }
+.sync-modal__actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.modal__body .sync-modal__text + .btn { margin-bottom: 16px; }
+
+.toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.search {
+  flex: 1 1 320px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 16px;
+  box-shadow: var(--shadow-card);
+}
+.search svg { color: var(--text-faint); flex-shrink: 0; }
+.search input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 12px 0;
+  font-size: 14px;
+  color: var(--text);
+}
+.search input::placeholder { color: var(--text-faint); }
+
+.pills {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+  scrollbar-width: thin;
+}
+.pill {
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 13px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.pill:hover { border-color: var(--accent); color: var(--text); }
+.pill--active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.pill__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: rgba(22, 33, 26, 0.07);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+.pill--active .pill__count { background: rgba(255,255,255,0.25); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px 18px;
+}
+
+/* ---------- bank card ---------- */
+.badge {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  padding: 24px 20px 20px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.badge:hover { box-shadow: 0 10px 30px rgba(23, 41, 31, 0.11); transform: translateY(-2px); }
+.badge__top { display: flex; align-items: flex-start; gap: 13px; }
+.badge__medal {
+  width: 48px; height: 36px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px;
+  font-family: var(--font-display);
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: inset 0 11px 0 -7px rgba(255,255,255,0.4);
+}
+.badge__medal--logo { background: #f2f5f2; padding: 4px; box-shadow: none; }
+.badge__medal--logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 6px; display: block; }
+.badge__headtext { flex: 1; min-width: 0; }
+.badge__name { font-family: var(--font-display); font-weight: 600; font-size: 15px; line-height: 1.3; word-break: break-word; color: var(--text); }
+.badge__cat {
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.badge__actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+.badge__contacts { margin-top: 15px; display: flex; flex-direction: column; gap: 10px; }
+.contact {
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+}
+.contact:first-child { padding-top: 0; border-top: none; }
+.contact__name { font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
+.contact__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 3px; }
+.contact__link {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  min-width: 0;
+}
+.contact__link:hover { color: var(--accent); }
+.contact__link svg { flex-shrink: 0; color: var(--text-faint); }
+.contact__link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--font-mono); font-size: 12px; }
+
+.row2 { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-soft); }
+.row2 svg { color: var(--text-faint); flex-shrink: 0; }
+.row2--muted { color: var(--text-dim); font-size: 12.5px; }
+.row2 a.contact__link { font-size: 13px; color: var(--accent); font-weight: 600; }
+.row2 a.contact__link span { font-family: var(--font-body); }
+
+.access { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-soft); }
+.access__title { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); font-weight: 600; margin-bottom: 6px; }
+.access__row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.access__label { font-size: 12px; color: var(--text-dim); width: 52px; flex-shrink: 0; }
+.access__value { font-family: var(--font-mono); font-size: 12.5px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-soft); }
+.chip { display: flex; align-items: center; gap: 6px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 5px 11px; font-size: 11.5px; }
+.chip__label { color: var(--text-dim); }
+.chip__value { font-family: var(--font-mono); color: var(--accent); font-weight: 600; }
+
+.notes {
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-soft);
+  font-size: 12.5px; line-height: 1.55; color: var(--text-dim);
+}
+
+.empty {
+  grid-column: 1 / -1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px;
+  padding: 60px 20px;
+  color: var(--text-dim);
+  text-align: center;
+}
+.empty__msg { font-size: 14px; }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 11px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--surface-2); }
+.btn:active { transform: scale(0.96); }
+.btn--accent { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; box-shadow: 0 6px 16px rgba(30, 155, 92, 0.3); }
+.btn--accent:hover { filter: brightness(1.06); box-shadow: 0 8px 20px rgba(30, 155, 92, 0.36); }
+.btn--ghost { background: var(--surface); }
+.btn--danger { background: var(--red); border-color: var(--red); color: #fff; font-weight: 700; }
+.btn--danger:hover { filter: brightness(1.06); }
+.btn--sm { padding: 8px 14px; font-size: 12px; margin-top: 8px; }
+
+.iconbtn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-dim);
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.iconbtn:hover { background: var(--surface-2); color: var(--text); }
+.iconbtn--danger:hover { background: #fdeeee; color: var(--red); }
+
+/* ---------- modal / overlay ---------- */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(22, 33, 26, 0.32);
+  z-index: 50;
+  overflow-y: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 16px;
+}
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-modal);
+  width: 100%;
+  max-width: 640px;
+  margin: auto;
+}
+.modal__head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.modal__head h2 { font-family: var(--font-display); font-size: 16px; margin: 0; font-weight: 600; }
+.modal__body { padding: 20px 22px; display: flex; flex-direction: column; gap: 16px; }
+.modal__foot { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 22px; border-top: 1px solid var(--border-soft); }
+
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field label { font-size: 12px; color: var(--text-dim); font-weight: 600; }
+.field input[type="text"], .field input[type="password"], .field select, .field textarea {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+  font-size: 13.5px;
+  width: 100%;
+  outline: none;
+}
+.field textarea { resize: vertical; font-family: var(--font-mono); line-height: 1.5; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.contact-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+.contact-row input, .field-row-item input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  padding: 9px 11px;
+  font-size: 12.5px;
+  width: 100%;
+  outline: none;
+}
+.field-row-item { display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
+
+.passwrap { display: flex; gap: 6px; align-items: center; }
+.passwrap input { flex: 1; }
+
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; }
+.swatch { cursor: pointer; }
+.swatch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.swatch__dot {
+  display: block; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--sw);
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 2px var(--surface);
+}
+.swatch input:checked + .swatch__dot { border-color: var(--text); }
+
+.logo-field { display: flex; align-items: center; gap: 10px; padding-top: 2px; }
+.logo-field .btn { margin-top: 0; }
+.logo-field__preview {
+  width: 46px; height: 46px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+}
+.logo-field__preview img { width: 100%; height: 100%; object-fit: contain; }
+.logo-field__ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #fff; }
+.logo-field__upload { cursor: pointer; }
+
+.confirm {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-modal);
+  max-width: 380px;
+  width: 100%;
+  margin: auto;
+  padding: 24px;
+}
+.confirm__title { font-family: var(--font-display); font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.confirm__text { font-size: 13px; color: var(--text-dim); line-height: 1.5; margin-bottom: 18px; }
+.confirm__actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ---------- toast ---------- */
+#toastRoot { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 60; }
+.toast {
+  background: var(--text);
+  border: 1px solid var(--text);
+  color: var(--bg);
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: 0 12px 30px rgba(23, 41, 31, 0.22);
+}
+.toast--error { background: var(--red); border-color: var(--red); color: #fff; }
+
+/* ---------- focus ---------- */
+button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 640px) {
+  #app { padding: 20px 14px 48px; }
+  .header h1 { font-size: 18px; }
+  .field-row { grid-template-columns: 1fr; }
+  .contact-row { grid-template-columns: 1fr 1fr; }
+  .field-row-item { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+  .badge:hover { transform: none; }
+}
+
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">
+<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="spin"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>
+  <div>Загрузка базы банков…</div>
+</div>
+
+<div id="app" style="display:none;">
+  <header class="header">
+    <div class="header__brand">
+      <div class="header__mark">Б</div>
+      <div>
+        <h1>База банков-партнёров</h1>
+        <p class="header__sub">Контакты, доступы и условия — в одном месте</p>
+      </div>
+    </div>
+    <div class="header__right">
+      <button class="sync-badge sync-badge--off" id="syncBadge" data-action="open-sync" type="button" title="Синхронизация с Яндекс.Диском">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+        <span id="syncBadgeText">Синхронизация</span>
+      </button>
+      <div class="header__stats" id="resultCount">0 из 0</div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="search">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="searchInput" type="text" placeholder="Найти по банку, ФИО, телефону, email, Telegram…" autocomplete="off">
+    </div>
+    <button class="btn btn--ghost" data-action="export-data" type="button" title="Скачать резервную копию базы (.json)">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Экспорт
+    </button>
+    <label class="btn btn--ghost" title="Загрузить базу из файла резервной копии (.json)">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Импорт
+      <input id="f-import-file" type="file" accept="application/json,.json" hidden>
+    </label>
+    <button class="btn btn--accent" data-action="add" type="button">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Добавить банк
+    </button>
+  </div>
+
+  <div id="pills" class="pills"></div>
+
+  <div id="cardsGrid" class="grid"></div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="confirmRoot"></div>
+<div id="toastRoot"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var CATEGORIES = ['Банк', 'Бизнес', 'Автокредит', 'Ипотека', 'Лизинг', 'МФО', 'Краудплатформа', 'Инвестор', 'КПК', 'Ипотека Застройщики', 'Источники', 'Страховка'];
+
+  var PALETTE = ['#8A6324', '#276B60', '#3E4F8F', '#8A3D4E', '#516B33', '#5C4177', '#2C5A6E', '#75551F', '#2F7359', '#684D8F', '#4E3568', '#33508F'];
+
+  var SEED_DATA = [];
+
+  var banks = [];
+  var query = '';
+  var activeCategory = 'Все';
+  var revealed = {};
+  var toastTimer = null;
+  var pendingLogo = '';
+  var logoPlaceholderHtml = '';
+
+  function uid() { return 'id' + Math.random().toString(36).slice(2, 10); }
+
+  function esc(v) {
+    if (v === undefined || v === null) return '';
+    return String(v)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function initials(name) {
+    var clean = (name || '').trim();
+    if (!clean) return '—';
+    var parts = clean.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return clean.slice(0, 2).toUpperCase();
+  }
+
+  function isUrl(v) { return /^https?:\/\//i.test((v || '').trim()); }
+  function telHref(phone) { return 'tel:' + (phone || '').replace(/[^\d+]/g, ''); }
+  function tgHref(handle) { return 'https://t.me/' + encodeURIComponent((handle || '').replace(/^@/, '')); }
+
+  function icon(name) {
+    var icons = {
+      search: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
+      plus: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+      edit: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+      trash: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>',
+      eye: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+      eyeOff: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-5.94M9.9 4.24A10.5 10.5 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.66 3.94M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>',
+      copy: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>',
+      link: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>',
+      phone: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.58 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>',
+      mail: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>',
+      send: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-11 11"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>',
+      close: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+      refresh: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>',
+      spinner: '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="spin"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>'
+    };
+    return icons[name] || '';
+  }
+
+  // ---------- storage ----------
+  var STORAGE_KEY = 'banks_data';
+  var storageMode = 'memory'; // 'claude' | 'local' | 'memory'
+
+  function detectStorageMode() {
+    if (window.storage && typeof window.storage.get === 'function' && typeof window.storage.set === 'function') {
+      return 'claude';
+    }
+    try {
+      var t = '__bp_test__';
+      window.localStorage.setItem(t, '1');
+      window.localStorage.removeItem(t);
+      return 'local';
+    } catch (e) {
+      return 'memory';
+    }
+  }
+
+  function loadData() {
+    storageMode = detectStorageMode();
+
+    if (storageMode === 'claude') {
+      window.storage.get(STORAGE_KEY, false).then(function (res) {
+        if (res && res.value) {
+          try { banks = JSON.parse(res.value); } catch (e) { banks = SEED_DATA.slice(); }
+        } else {
+          banks = SEED_DATA.slice();
+          window.storage.set(STORAGE_KEY, JSON.stringify(banks), false)['catch'](function () {});
+        }
+        onDataReady();
+      })['catch'](function () {
+        banks = SEED_DATA.slice();
+        onDataReady();
+      });
+      return;
+    }
+
+    if (storageMode === 'local') {
+      var raw = null;
+      try { raw = window.localStorage.getItem(STORAGE_KEY); } catch (e) {}
+      if (raw) {
+        try { banks = JSON.parse(raw); } catch (e) { banks = SEED_DATA.slice(); }
+      } else {
+        banks = SEED_DATA.slice();
+        try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(banks)); } catch (e) {}
+      }
+      onDataReady();
+      return;
+    }
+
+    banks = SEED_DATA.slice();
+    onDataReady();
+    toast('Автосохранение недоступно в этом браузере — сохраняйте через «Экспорт»', 'error', 6000);
+  }
+
+  function persist() {
+    var json = JSON.stringify(banks);
+    if (storageMode === 'claude') {
+      window.storage.set(STORAGE_KEY, json, false).then(function (res) {
+        if (!res) toast('Не удалось сохранить', 'error');
+      })['catch'](function () { toast('Ошибка сохранения', 'error'); });
+    } else if (storageMode === 'local') {
+      try {
+        window.localStorage.setItem(STORAGE_KEY, json);
+      } catch (e) {
+        toast('Не удалось сохранить — хранилище браузера недоступно', 'error');
+      }
+    }
+    if (yandexToken) yandexPushToDisk();
+  }
+
+  function onDataReady() {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    renderPills();
+    renderCards();
+    initYandexSync();
+  }
+
+  // ---------- yandex disk sync ----------
+  var YANDEX_CLIENT_ID = 'cd764f1b5bf64075b2e37048e1694e42';
+  // Yandex Disk's file-content endpoints don't send CORS headers, so the browser can't read
+  // them directly (confirmed: "blocked by CORS policy" on downloader.disk.yandex.ru). This
+  // proxy — a small Yandex Cloud Function — relays the calls server-side and adds CORS itself.
+  var YANDEX_PROXY_URL = 'https://functions.yandexcloud.net/d4e3apq5a8uo79h7hueu';
+  var YANDEX_TOKEN_KEY = 'yandex_disk_token';
+
+  var yandexToken = '';
+  var yandexSyncState = 'off'; // 'off' | 'connected' | 'syncing' | 'error'
+
+  function loadYandexToken() {
+    try { return window.localStorage.getItem(YANDEX_TOKEN_KEY) || ''; } catch (e) { return ''; }
+  }
+  function saveYandexToken(token) {
+    try { window.localStorage.setItem(YANDEX_TOKEN_KEY, token); } catch (e) {}
+  }
+  function removeYandexToken() {
+    try { window.localStorage.removeItem(YANDEX_TOKEN_KEY); } catch (e) {}
+  }
+
+  function yandexAuthUrl() {
+    return 'https://oauth.yandex.ru/authorize?response_type=token&client_id=' + encodeURIComponent(YANDEX_CLIENT_ID) + '&scope=' + encodeURIComponent('cloud_api:disk.app_folder');
+  }
+
+  function setSyncState(state) {
+    yandexSyncState = state;
+    renderSyncBadge();
+  }
+
+  function renderSyncBadge() {
+    var badge = document.getElementById('syncBadge');
+    var text = document.getElementById('syncBadgeText');
+    if (!badge || !text) return;
+    badge.className = 'sync-badge sync-badge--' + yandexSyncState;
+    var labels = { off: 'Синхронизация', connected: 'Синхронизировано', syncing: 'Синхронизация…', error: 'Ошибка синхронизации' };
+    text.textContent = labels[yandexSyncState] || 'Синхронизация';
+  }
+
+  function yandexDownload() {
+    return fetch(YANDEX_PROXY_URL + '?token=' + encodeURIComponent(yandexToken), {
+      method: 'GET'
+    }).then(function (res) {
+      if (res.status === 404) return { found: false };
+      if (res.status === 401) { var e = new Error('unauthorized'); e.code = 401; throw e; }
+      if (!res.ok) throw new Error('proxy-download ' + res.status);
+      return res.json().then(function (data) { return { found: true, data: data }; });
+    });
+  }
+
+  function yandexUpload(banksData) {
+    return fetch(YANDEX_PROXY_URL + '?token=' + encodeURIComponent(yandexToken), {
+      method: 'POST',
+      body: JSON.stringify(banksData)
+    }).then(function (res) {
+      if (res.status === 401) { var e = new Error('unauthorized'); e.code = 401; throw e; }
+      if (!res.ok) throw new Error('proxy-upload ' + res.status);
+      return res.json();
+    }).then(function (result) {
+      if (!result || !result.ok) throw new Error('proxy-upload-failed');
+      return true;
+    });
+  }
+
+  function handleYandexAuthError() {
+    removeYandexToken();
+    yandexToken = '';
+    setSyncState('off');
+    toast('Яндекс.Диск отключился — переподключи через шапку', 'error', 5000);
+  }
+
+  function yandexSyncFromDisk() {
+    if (!yandexToken) return;
+    setSyncState('syncing');
+    yandexDownload().then(function (result) {
+      if (result.found) {
+        banks = Array.isArray(result.data) ? result.data.map(normalizeBank) : banks;
+        renderPills();
+        renderCards();
+        if (storageMode === 'claude' && window.storage) {
+          window.storage.set(STORAGE_KEY, JSON.stringify(banks), false)['catch'](function () {});
+        } else if (storageMode === 'local') {
+          try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(banks)); } catch (e) {}
+        }
+        setSyncState('connected');
+      } else {
+        return yandexUpload(banks).then(function () { setSyncState('connected'); });
+      }
+    })['catch'](function (err) {
+      if (err && err.code === 401) { handleYandexAuthError(); return; }
+      setSyncState('error');
+      toast('Не удалось связаться с Яндекс.Диском', 'error');
+    });
+  }
+
+  function yandexPushToDisk() {
+    if (!yandexToken) return;
+    setSyncState('syncing');
+    yandexUpload(banks).then(function () {
+      setSyncState('connected');
+    })['catch'](function (err) {
+      if (err && err.code === 401) { handleYandexAuthError(); return; }
+      setSyncState('error');
+      toast('Сохранено локально, но не на Яндекс.Диск', 'error');
+    });
+  }
+
+  function initYandexSync() {
+    yandexToken = loadYandexToken();
+    if (yandexToken) {
+      setSyncState('connected');
+      yandexSyncFromDisk();
+    } else {
+      setSyncState('off');
+    }
+  }
+
+  function renderSyncModal() {
+    var connected = !!yandexToken;
+    var body;
+    if (connected) {
+      body = '<p class="sync-modal__text">Подключено — данные хранятся в папке приложения на твоём Яндекс.Диске и синхронизируются на всех устройствах, где вставлен код входа.</p>' +
+        '<div class="sync-modal__actions">' +
+        '<button class="btn btn--ghost" data-action="sync-now" type="button">' + icon('refresh') + ' Синхронизировать сейчас</button>' +
+        '<button class="btn btn--danger" data-action="disconnect-yandex" type="button">Отключить на этом устройстве</button>' +
+        '</div>';
+    } else {
+      body = '<p class="sync-modal__text">Один раз на каждом устройстве: открой ссылку, войди в Яндекс, скопируй код с экрана и вставь сюда.</p>' +
+        '<a class="btn btn--ghost" href="' + esc(yandexAuthUrl()) + '" target="_blank" rel="noopener noreferrer">' + icon('link') + ' Открыть страницу входа</a>' +
+        '<div class="field"><label>Код с экрана Яндекса</label><input id="f-yandex-token" type="text" placeholder="Вставь сюда" autocomplete="off"></div>';
+    }
+    var html = '<div class="overlay" data-action="overlay">' +
+      '<div class="modal modal--sync">' +
+      '<div class="modal__head"><h2>Синхронизация с Яндекс.Диском</h2>' +
+      '<button class="iconbtn" data-action="close-modal" type="button">' + icon('close') + '</button></div>' +
+      '<div class="modal__body">' + body + '</div>' +
+      '<div class="modal__foot">' +
+      '<button class="btn btn--ghost" data-action="close-modal" type="button">Закрыть</button>' +
+      (connected ? '' : '<button class="btn btn--accent" data-action="connect-yandex" type="button">Подключить</button>') +
+      '</div></div></div>';
+    document.getElementById('modalRoot').innerHTML = html;
+    var tokenInput = document.getElementById('f-yandex-token');
+    if (tokenInput) tokenInput.focus();
+  }
+
+  // ---------- pills ----------
+  function renderPills() {
+    var counts = {};
+    banks.forEach(function (b) { counts[b.category] = (counts[b.category] || 0) + 1; });
+    var all = ['Все'].concat(CATEGORIES);
+    var html = all.map(function (cat) {
+      var count = cat === 'Все' ? banks.length : (counts[cat] || 0);
+      var active = cat === activeCategory ? ' pill--active' : '';
+      return '<button class="pill' + active + '" data-cat="' + esc(cat) + '" type="button">' + esc(cat) + '<span class="pill__count">' + count + '</span></button>';
+    }).join('');
+    document.getElementById('pills').innerHTML = html;
+  }
+
+  // ---------- cards ----------
+  function matchesQuery(bank, q) {
+    if (!q) return true;
+    var pieces = [bank.name, bank.cabinet, bank.login, bank.notes];
+    (bank.contacts || []).forEach(function (c) { pieces.push(c.name, c.phone, c.email, c.telegram); });
+    (bank.fields || []).forEach(function (f) { pieces.push(f.label, f.value); });
+    var hay = pieces.filter(Boolean).join(' ').toLowerCase();
+    return hay.indexOf(q) !== -1;
+  }
+
+  function renderCards() {
+    var q = query.trim().toLowerCase();
+    var list = banks.filter(function (b) {
+      if (activeCategory !== 'Все' && b.category !== activeCategory) return false;
+      return matchesQuery(b, q);
+    });
+
+    document.getElementById('resultCount').textContent = list.length + ' из ' + banks.length;
+
+    if (list.length === 0) {
+      document.getElementById('cardsGrid').innerHTML = emptyStateHtml();
+      return;
+    }
+    document.getElementById('cardsGrid').innerHTML = list.map(cardHtml).join('');
+  }
+
+  function emptyStateHtml() {
+    var msg;
+    if (query.trim()) {
+      msg = 'Ничего не найдено по запросу «' + esc(query) + '».';
+    } else if (activeCategory === 'Все') {
+      msg = 'Пока пусто.';
+    } else {
+      msg = 'В категории «' + esc(activeCategory) + '» пока нет банков.';
+    }
+    return '<div class="empty"><div class="empty__msg">' + msg + '</div>' +
+      '<button class="btn btn--accent" data-action="add" type="button">' + icon('plus') + ' Добавить банк</button></div>';
+  }
+
+  function copyBtn(bankId, field, idx, label) {
+    var idxAttr = (idx === null || idx === undefined) ? '' : ' data-idx="' + idx + '"';
+    return '<button class="iconbtn" data-action="copy" data-bank="' + bankId + '" data-field="' + field + '"' + idxAttr + ' data-label="' + esc(label) + '" type="button" title="Скопировать: ' + esc(label) + '">' + icon('copy') + '</button>';
+  }
+
+  function contactRowHtml(bank, idx, field, value, hrefFn, iconName, label, openBlank) {
+    if (!value) return '';
+    var href = hrefFn(value);
+    var target = openBlank ? ' target="_blank" rel="noopener noreferrer"' : '';
+    return '<div class="contact__row">' +
+      '<a class="contact__link" href="' + esc(href) + '"' + target + '>' + icon(iconName) + '<span>' + esc(value) + '</span></a>' +
+      copyBtn(bank.id, field, idx, label) +
+      '</div>';
+  }
+
+  function contactHtml(bank, c, idx) {
+    var out = '';
+    if (c.name) out += '<div class="contact__name">' + esc(c.name) + '</div>';
+    out += contactRowHtml(bank, idx, 'phone', c.phone, telHref, 'phone', 'Телефон', false);
+    out += contactRowHtml(bank, idx, 'email', c.email, function (v) { return 'mailto:' + v; }, 'mail', 'Email', false);
+    out += contactRowHtml(bank, idx, 'telegram', c.telegram, tgHref, 'send', 'Telegram', true);
+    if (!out) return '';
+    return '<div class="contact">' + out + '</div>';
+  }
+
+  function cabinetHtml(bank) {
+    if (!bank.cabinet) return '';
+    if (isUrl(bank.cabinet)) {
+      return '<div class="row2"><a class="contact__link" href="' + esc(bank.cabinet) + '" target="_blank" rel="noopener noreferrer">' + icon('link') + '<span>Личный кабинет</span></a>' + copyBtn(bank.id, 'cabinet', null, 'Ссылка') + '</div>';
+    }
+    return '<div class="row2 row2--muted">' + icon('link') + '<span>' + esc(bank.cabinet) + '</span></div>';
+  }
+
+  function accessHtml(bank) {
+    if (!bank.login && !bank.password) return '';
+    var isRevealed = !!revealed[bank.id];
+    var passDisplay = bank.password ? (isRevealed ? esc(bank.password) : '••••••••') : '';
+    var parts = '';
+    if (bank.login) {
+      parts += '<div class="access__row"><span class="access__label">Логин</span><span class="access__value">' + esc(bank.login) + '</span>' + copyBtn(bank.id, 'login', null, 'Логин') + '</div>';
+    }
+    if (bank.password) {
+      parts += '<div class="access__row"><span class="access__label">Пароль</span><span class="access__value">' + passDisplay + '</span>' +
+        '<button class="iconbtn" data-action="toggle-pass" data-bank="' + bank.id + '" type="button" title="' + (isRevealed ? 'Скрыть' : 'Показать') + '">' + icon(isRevealed ? 'eyeOff' : 'eye') + '</button>' +
+        copyBtn(bank.id, 'password', null, 'Пароль') + '</div>';
+    }
+    return '<div class="access"><div class="access__title">Доступ</div>' + parts + '</div>';
+  }
+
+  function chipHtml(f) {
+    return '<span class="chip"><span class="chip__label">' + esc(f.label) + '</span><span class="chip__value">' + esc(f.value) + '</span></span>';
+  }
+
+  function fieldsHtml(bank) {
+    if (!bank.fields || !bank.fields.length) return '';
+    return '<div class="chips">' + bank.fields.map(chipHtml).join('') + '</div>';
+  }
+
+  function notesHtml(bank) {
+    if (!bank.notes) return '';
+    return '<div class="notes">' + esc(bank.notes).replace(/\n/g, '<br>') + '</div>';
+  }
+
+  function medalHtml(bank) {
+    if (bank.logo) {
+      return '<div class="badge__medal badge__medal--logo"><img src="' + esc(bank.logo) + '" alt=""></div>';
+    }
+    return '<div class="badge__medal" style="background:' + esc(bank.color) + '">' + esc(initials(bank.name)) + '</div>';
+  }
+
+  function cardHtml(bank) {
+    var cts = (bank.contacts || []).map(function (c, i) { return contactHtml(bank, c, i); }).join('');
+    return '<article class="badge">' +
+      '<div class="badge__top">' +
+      medalHtml(bank) +
+      '<div class="badge__headtext"><div class="badge__name">' + esc(bank.name) + '</div><div class="badge__cat">' + esc(bank.category) + '</div></div>' +
+      '<div class="badge__actions">' +
+      '<button class="iconbtn" data-action="edit" data-bank="' + bank.id + '" type="button" title="Изменить">' + icon('edit') + '</button>' +
+      '<button class="iconbtn iconbtn--danger" data-action="delete" data-bank="' + bank.id + '" type="button" title="Удалить">' + icon('trash') + '</button>' +
+      '</div></div>' +
+      (cts ? '<div class="badge__contacts">' + cts + '</div>' : '') +
+      cabinetHtml(bank) + accessHtml(bank) + fieldsHtml(bank) + notesHtml(bank) +
+      '</article>';
+  }
+
+  // ---------- modal ----------
+  function emptyBank() {
+    return { id: uid(), name: '', category: 'Банк', color: PALETTE[Math.floor(Math.random() * PALETTE.length)], contacts: [{ id: uid(), name: '', phone: '', email: '', telegram: '' }], cabinet: '', login: '', password: '', fields: [], notes: '', logo: '' };
+  }
+
+  function contactFormRow(c) {
+    return '<div class="contact-row">' +
+      '<input class="cf-name" type="text" value="' + esc(c.name) + '" placeholder="Имя">' +
+      '<input class="cf-phone" type="text" value="' + esc(c.phone) + '" placeholder="Телефон">' +
+      '<input class="cf-email" type="text" value="' + esc(c.email) + '" placeholder="Email">' +
+      '<input class="cf-tg" type="text" value="' + esc(c.telegram) + '" placeholder="Telegram">' +
+      '<button class="iconbtn iconbtn--danger" data-action="remove-contact" type="button" title="Удалить контакт">' + icon('trash') + '</button>' +
+      '</div>';
+  }
+
+  function fieldFormRow(f) {
+    return '<div class="field-row-item">' +
+      '<input class="ff-label" type="text" value="' + esc(f.label) + '" placeholder="Например, Ставка">' +
+      '<input class="ff-value" type="text" value="' + esc(f.value) + '" placeholder="Например, 20,8%">' +
+      '<button class="iconbtn iconbtn--danger" data-action="remove-field" type="button" title="Удалить условие">' + icon('trash') + '</button>' +
+      '</div>';
+  }
+
+  function openAddModal() { renderModal(null); }
+  function openEditModal(id) {
+    var bank = banks.filter(function (b) { return b.id === id; })[0];
+    if (!bank) return;
+    renderModal(bank);
+  }
+  function closeModal() { document.getElementById('modalRoot').innerHTML = ''; }
+
+  function renderModal(bank) {
+    var isNew = !bank;
+    var b = bank || emptyBank();
+
+    pendingLogo = b.logo || '';
+    logoPlaceholderHtml = '<span class="logo-field__ph" style="background:' + esc(b.color) + '">' + esc(initials(b.name)) + '</span>';
+
+    var contactsHtml = b.contacts.map(contactFormRow).join('');
+    var fieldsHtmlStr = (b.fields || []).map(fieldFormRow).join('');
+    var catOptions = CATEGORIES.map(function (c) { return '<option value="' + esc(c) + '"' + (c === b.category ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('');
+    var swatches = PALETTE.map(function (hex) {
+      return '<label class="swatch" style="--sw:' + hex + '"><input type="radio" name="color" value="' + hex + '"' + (hex === b.color ? ' checked' : '') + '><span class="swatch__dot"></span></label>';
+    }).join('');
+    var logoPreviewInner = pendingLogo ? ('<img src="' + esc(pendingLogo) + '" alt="">') : logoPlaceholderHtml;
+    var logoBlock = '<div class="field"><label>Логотип</label><div class="logo-field">' +
+      '<div class="logo-field__preview" id="logoPreview">' + logoPreviewInner + '</div>' +
+      '<label class="btn btn--ghost logo-field__upload">' + icon('plus') + ' Загрузить<input id="f-logo-file" type="file" accept="image/*" hidden></label>' +
+      '<button class="btn btn--ghost" data-action="remove-logo" type="button" id="removeLogoBtn"' + (pendingLogo ? '' : ' style="display:none"') + '>Убрать</button>' +
+      '</div></div>';
+
+    var html = '<div class="overlay" data-action="overlay">' +
+      '<div class="modal" data-bank-id="' + b.id + '">' +
+      '<div class="modal__head"><h2>' + (isNew ? 'Новый банк' : 'Изменить банк') + '</h2>' +
+      '<button class="iconbtn" data-action="close-modal" type="button">' + icon('close') + '</button></div>' +
+      '<div class="modal__body">' +
+      '<div class="field"><label>Название банка</label><input id="f-name" type="text" value="' + esc(b.name) + '" placeholder="Например, Совкомбанк"></div>' +
+      '<div class="field-row">' +
+      '<div class="field"><label>Категория</label><select id="f-category">' + catOptions + '</select></div>' +
+      '<div class="field"><label>Метка</label><div class="swatches">' + swatches + '</div></div>' +
+      '</div>' +
+      logoBlock +
+      '<div class="field"><label>Контакты</label><div id="contactsList">' + contactsHtml + '</div>' +
+      '<button class="btn btn--ghost btn--sm" data-action="add-contact" type="button">' + icon('plus') + ' Добавить контакт</button></div>' +
+      '<div class="field"><label>Личный кабинет / способ подачи</label><input id="f-cabinet" type="text" value="' + esc(b.cabinet) + '" placeholder="Ссылка на ЛК или, например, «Заявки на почту»"></div>' +
+      '<div class="field-row">' +
+      '<div class="field"><label>Логин</label><input id="f-login" type="text" value="' + esc(b.login) + '"></div>' +
+      '<div class="field"><label>Пароль</label><div class="passwrap"><input id="f-password" type="password" value="' + esc(b.password) + '"><button class="iconbtn" data-action="toggle-form-pass" type="button">' + icon('eye') + '</button></div></div>' +
+      '</div>' +
+      '<div class="field"><label>Условия</label><div id="fieldsList">' + fieldsHtmlStr + '</div>' +
+      '<button class="btn btn--ghost btn--sm" data-action="add-field" type="button">' + icon('plus') + ' Добавить условие</button></div>' +
+      '<div class="field"><label>Заметки</label><textarea id="f-notes" rows="3" placeholder="Инструкции по подаче, особенности...">' + esc(b.notes) + '</textarea></div>' +
+      '</div>' +
+      '<div class="modal__foot">' +
+      '<button class="btn btn--ghost" data-action="close-modal" type="button">Отмена</button>' +
+      '<button class="btn btn--accent" data-action="save" data-new="' + (isNew ? '1' : '0') + '" type="button">Сохранить</button>' +
+      '</div></div></div>';
+
+    document.getElementById('modalRoot').innerHTML = html;
+    var nameInput = document.getElementById('f-name');
+    if (nameInput) nameInput.focus();
+  }
+
+  function updateLogoPreview() {
+    var preview = document.getElementById('logoPreview');
+    var removeBtn = document.getElementById('removeLogoBtn');
+    if (!preview) return;
+    preview.innerHTML = pendingLogo ? ('<img src="' + esc(pendingLogo) + '" alt="">') : logoPlaceholderHtml;
+    if (removeBtn) removeBtn.style.display = pendingLogo ? '' : 'none';
+  }
+
+  function readAndResizeImage(file, maxDim, cb) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var result = e.target.result;
+      if (typeof Image === 'undefined') { cb(result); return; }
+      var img = new Image();
+      img.onload = function () {
+        try {
+          var w = img.width, h = img.height;
+          var scale = Math.min(1, maxDim / Math.max(w, h));
+          var cw = Math.max(1, Math.round(w * scale));
+          var ch = Math.max(1, Math.round(h * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = cw; canvas.height = ch;
+          var ctx = canvas.getContext && canvas.getContext('2d');
+          if (!ctx) { cb(result); return; }
+          ctx.drawImage(img, 0, 0, cw, ch);
+          cb(canvas.toDataURL('image/png'));
+        } catch (err) { cb(result); }
+      };
+      img.onerror = function () { cb(result); };
+      img.src = result;
+    };
+    reader.onerror = function () { cb(''); };
+    reader.readAsDataURL(file);
+  }
+
+  function saveModal(isNewFlag) {
+    var modal = document.querySelector('.modal');
+    var id = modal.getAttribute('data-bank-id');
+    var name = document.getElementById('f-name').value.trim();
+    if (!name) { toast('Укажите название банка', 'error'); document.getElementById('f-name').focus(); return; }
+
+    var category = document.getElementById('f-category').value;
+    var colorInput = document.querySelector('input[name="color"]:checked');
+    var color = colorInput ? colorInput.value : PALETTE[0];
+    var cabinet = document.getElementById('f-cabinet').value.trim();
+    var login = document.getElementById('f-login').value.trim();
+    var password = document.getElementById('f-password').value;
+    var notes = document.getElementById('f-notes').value.trim();
+
+    var contacts = [];
+    document.querySelectorAll('#contactsList .contact-row').forEach(function (row) {
+      var c = {
+        id: uid(),
+        name: row.querySelector('.cf-name').value.trim(),
+        phone: row.querySelector('.cf-phone').value.trim(),
+        email: row.querySelector('.cf-email').value.trim(),
+        telegram: row.querySelector('.cf-tg').value.trim()
+      };
+      if (c.name || c.phone || c.email || c.telegram) contacts.push(c);
+    });
+
+    var fields = [];
+    document.querySelectorAll('#fieldsList .field-row-item').forEach(function (row) {
+      var f = { id: uid(), label: row.querySelector('.ff-label').value.trim(), value: row.querySelector('.ff-value').value.trim() };
+      if (f.label || f.value) fields.push(f);
+    });
+
+    var bankObj = { id: id, name: name, category: category, color: color, contacts: contacts, cabinet: cabinet, login: login, password: password, fields: fields, notes: notes, logo: pendingLogo };
+
+    var idx = -1;
+    for (var i = 0; i < banks.length; i++) { if (banks[i].id === id) { idx = i; break; } }
+    if (idx === -1) banks.unshift(bankObj); else banks[idx] = bankObj;
+
+    persist();
+    renderPills();
+    renderCards();
+    closeModal();
+    toast(isNewFlag ? 'Банк добавлен' : 'Изменения сохранены');
+  }
+
+  // ---------- delete confirm ----------
+  function openConfirmDelete(id) {
+    var bank = banks.filter(function (b) { return b.id === id; })[0];
+    if (!bank) return;
+    var html = '<div class="overlay" data-action="confirm-overlay"><div class="confirm">' +
+      '<div class="confirm__title">Удалить «' + esc(bank.name) + '»?</div>' +
+      '<div class="confirm__text">Контакты, доступы и условия по этому банку удалятся без возможности восстановить.</div>' +
+      '<div class="confirm__actions">' +
+      '<button class="btn btn--ghost" data-action="cancel-delete" type="button">Отмена</button>' +
+      '<button class="btn btn--danger" data-action="confirm-delete" data-bank="' + id + '" type="button">Удалить</button>' +
+      '</div></div></div>';
+    document.getElementById('confirmRoot').innerHTML = html;
+  }
+  function closeConfirm() { document.getElementById('confirmRoot').innerHTML = ''; }
+  function performDelete(id) {
+    banks = banks.filter(function (b) { return b.id !== id; });
+    persist();
+    renderPills();
+    renderCards();
+    closeConfirm();
+    toast('Банк удалён');
+  }
+
+  // ---------- backup: export / import ----------
+  function pluralRu(n, one, few, many) {
+    var mod10 = n % 10, mod100 = n % 100;
+    if (mod10 === 1 && mod100 !== 11) return one;
+    if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
+    return many;
+  }
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+  function exportData() {
+    try {
+      var json = JSON.stringify(banks, null, 2);
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var d = new Date();
+      var stamp = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'banki-partnery-backup-' + stamp + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      toast('Резервная копия скачана');
+    } catch (e) {
+      toast('Не удалось скачать резервную копию', 'error');
+    }
+  }
+
+  function normalizeBank(raw) {
+    raw = raw || {};
+    return {
+      id: raw.id || uid(),
+      name: raw.name || '',
+      category: CATEGORIES.indexOf(raw.category) !== -1 ? raw.category : 'Банк',
+      color: raw.color || PALETTE[0],
+      logo: raw.logo || '',
+      contacts: Array.isArray(raw.contacts) ? raw.contacts.map(function (c) {
+        c = c || {};
+        return { id: c.id || uid(), name: c.name || '', phone: c.phone || '', email: c.email || '', telegram: c.telegram || '' };
+      }) : [],
+      cabinet: raw.cabinet || '',
+      login: raw.login || '',
+      password: raw.password || '',
+      fields: Array.isArray(raw.fields) ? raw.fields.map(function (f) {
+        f = f || {};
+        return { id: f.id || uid(), label: f.label || '', value: f.value || '' };
+      }) : [],
+      notes: raw.notes || ''
+    };
+  }
+
+  var pendingImportData = null;
+
+  function importData(file) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var parsed;
+      try { parsed = JSON.parse(e.target.result); } catch (err) {
+        toast('Файл повреждён — не похоже на резервную копию', 'error');
+        return;
+      }
+      if (!Array.isArray(parsed)) {
+        toast('Файл повреждён — не похоже на резервную копию', 'error');
+        return;
+      }
+      var normalized = parsed.map(normalizeBank).filter(function (b) { return b.name; });
+      if (!normalized.length) {
+        toast('В файле нет ни одного банка', 'error');
+        return;
+      }
+      openConfirmImport(normalized);
+    };
+    reader.onerror = function () { toast('Не удалось прочитать файл', 'error'); };
+    reader.readAsText(file);
+  }
+
+  function openConfirmImport(data) {
+    pendingImportData = data;
+    var word = pluralRu(data.length, 'запись', 'записи', 'записей');
+    var html = '<div class="overlay" data-action="confirm-overlay"><div class="confirm">' +
+      '<div class="confirm__title">Заменить текущую базу?</div>' +
+      '<div class="confirm__text">В файле ' + data.length + ' ' + word + '. Текущие банки будут полностью заменены данными из файла — отменить нельзя.</div>' +
+      '<div class="confirm__actions">' +
+      '<button class="btn btn--ghost" data-action="cancel-import" type="button">Отмена</button>' +
+      '<button class="btn btn--danger" data-action="confirm-import" type="button">Заменить</button>' +
+      '</div></div></div>';
+    document.getElementById('confirmRoot').innerHTML = html;
+  }
+
+  function performImport() {
+    if (!pendingImportData) { closeConfirm(); return; }
+    banks = pendingImportData;
+    pendingImportData = null;
+    persist();
+    renderPills();
+    renderCards();
+    closeConfirm();
+    toast('Резервная копия загружена');
+  }
+
+  // ---------- toast ----------
+  function toast(text, type, duration) {
+    var root = document.getElementById('toastRoot');
+    root.innerHTML = '<div class="toast toast--' + (type || 'ok') + '">' + esc(text) + '</div>';
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { root.innerHTML = ''; }, duration || 2200);
+  }
+
+  // ---------- copy ----------
+  function copyValue(bankId, field, idx) {
+    var bank = banks.filter(function (b) { return b.id === bankId; })[0];
+    if (!bank) return '';
+    if (idx !== null && idx !== undefined && idx !== '') {
+      var c = bank.contacts[+idx];
+      return c ? (c[field] || '') : '';
+    }
+    return bank[field] || '';
+  }
+
+  function doCopy(text, label) {
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        toast((label || 'Значение') + ' скопирован');
+      })['catch'](function () { toast('Не удалось скопировать', 'error'); });
+    } else {
+      toast('Не удалось скопировать', 'error');
+    }
+  }
+
+  // ---------- events ----------
+  function init() {
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+
+      var pillBtn = t.closest ? t.closest('.pill') : null;
+      if (pillBtn) {
+        activeCategory = pillBtn.getAttribute('data-cat');
+        renderPills();
+        renderCards();
+        return;
+      }
+
+      var actionEl = t.closest ? t.closest('[data-action]') : null;
+      if (!actionEl) return;
+      var action = actionEl.getAttribute('data-action');
+
+      if (action === 'add') { openAddModal(); return; }
+      if (action === 'edit') { openEditModal(actionEl.getAttribute('data-bank')); return; }
+      if (action === 'delete') { openConfirmDelete(actionEl.getAttribute('data-bank')); return; }
+      if (action === 'copy') {
+        var val = copyValue(actionEl.getAttribute('data-bank'), actionEl.getAttribute('data-field'), actionEl.getAttribute('data-idx'));
+        doCopy(val, actionEl.getAttribute('data-label'));
+        return;
+      }
+      if (action === 'toggle-pass') {
+        var bid = actionEl.getAttribute('data-bank');
+        revealed[bid] = !revealed[bid];
+        renderCards();
+        return;
+      }
+      if (action === 'toggle-form-pass') {
+        var inp = document.getElementById('f-password');
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+        return;
+      }
+      if (action === 'close-modal') { closeModal(); return; }
+      if (action === 'overlay') { if (t === actionEl) closeModal(); return; }
+      if (action === 'save') { saveModal(actionEl.getAttribute('data-new') === '1'); return; }
+      if (action === 'add-contact') {
+        document.getElementById('contactsList').insertAdjacentHTML('beforeend', contactFormRow({ name: '', phone: '', email: '', telegram: '' }));
+        return;
+      }
+      if (action === 'remove-contact') { actionEl.closest('.contact-row').remove(); return; }
+      if (action === 'add-field') {
+        document.getElementById('fieldsList').insertAdjacentHTML('beforeend', fieldFormRow({ label: '', value: '' }));
+        return;
+      }
+      if (action === 'remove-field') { actionEl.closest('.field-row-item').remove(); return; }
+      if (action === 'remove-logo') { pendingLogo = ''; updateLogoPreview(); return; }
+      if (action === 'cancel-delete') { closeConfirm(); return; }
+      if (action === 'confirm-delete') { performDelete(actionEl.getAttribute('data-bank')); return; }
+      if (action === 'confirm-overlay') { if (t === actionEl) closeConfirm(); return; }
+      if (action === 'export-data') { exportData(); return; }
+      if (action === 'cancel-import') { pendingImportData = null; closeConfirm(); return; }
+      if (action === 'confirm-import') { performImport(); return; }
+      if (action === 'open-sync') { renderSyncModal(); return; }
+      if (action === 'connect-yandex') {
+        var tokenInput = document.getElementById('f-yandex-token');
+        var tokenVal = tokenInput ? tokenInput.value.trim() : '';
+        if (!tokenVal) { toast('Вставь код из Яндекса', 'error'); return; }
+        yandexToken = tokenVal;
+        saveYandexToken(tokenVal);
+        closeModal();
+        yandexSyncFromDisk();
+        return;
+      }
+      if (action === 'disconnect-yandex') {
+        removeYandexToken();
+        yandexToken = '';
+        setSyncState('off');
+        closeModal();
+        toast('Синхронизация отключена на этом устройстве');
+        return;
+      }
+      if (action === 'sync-now') { closeModal(); yandexSyncFromDisk(); return; }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeModal(); closeConfirm(); }
+    });
+
+    document.getElementById('searchInput').addEventListener('input', function (e) {
+      query = e.target.value;
+      renderCards();
+    });
+
+    document.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t && t.id === 'f-logo-file') {
+        var file = t.files && t.files[0];
+        if (!file) return;
+        if (!/^image\//.test(file.type)) { toast('Нужен файл изображения', 'error'); t.value = ''; return; }
+        readAndResizeImage(file, 160, function (dataUrl) {
+          if (!dataUrl) { toast('Не удалось загрузить логотип', 'error'); return; }
+          pendingLogo = dataUrl;
+          updateLogoPreview();
+        });
+        return;
+      }
+      if (t && t.id === 'f-import-file') {
+        var importFile = t.files && t.files[0];
+        t.value = '';
+        if (!importFile) return;
+        importData(importFile);
+      }
+    });
+
+    loadData();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
+</script>
+</body>
+</html>
