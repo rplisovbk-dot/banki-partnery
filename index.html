@@ -189,28 +189,29 @@ a { color: inherit; text-decoration: none; }
   transition: box-shadow 0.2s, transform 0.2s;
 }
 .badge:hover { box-shadow: 0 10px 30px rgba(23, 41, 31, 0.11); transform: translateY(-2px); }
-.badge__top { display: flex; align-items: flex-start; gap: 13px; }
+.badge__top { display: flex; align-items: flex-start; gap: 15px; }
 .badge__medal {
-  width: 48px; height: 36px;
-  border-radius: 9px;
+  width: 76px; height: 76px;
+  border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 13px;
+  font-weight: 700; font-size: 22px;
   font-family: var(--font-display);
   color: #ffffff;
   flex-shrink: 0;
-  box-shadow: inset 0 11px 0 -7px rgba(255,255,255,0.4);
+  box-shadow: inset 0 22px 0 -15px rgba(255,255,255,0.35);
 }
-.badge__medal--logo { background: #f2f5f2; padding: 4px; box-shadow: none; }
-.badge__medal--logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 6px; display: block; }
-.badge__headtext { flex: 1; min-width: 0; }
-.badge__name { font-family: var(--font-display); font-weight: 600; font-size: 15px; line-height: 1.3; word-break: break-word; color: var(--text); }
+.badge__medal--logo { background: transparent; padding: 0; box-shadow: none; border: 1px solid var(--border-soft); }
+.badge__medal--logo img { width: 100%; height: 100%; object-fit: contain; border-radius: 15px; display: block; }
+.badge__headtext { flex: 1; min-width: 0; padding-top: 2px; }
+.badge__name { font-family: var(--font-display); font-weight: 600; font-size: 16px; line-height: 1.3; word-break: break-word; color: var(--text); }
 .badge__cat {
   font-size: 11px;
   color: var(--text-faint);
-  margin-top: 3px;
+  margin-top: 4px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   font-weight: 600;
+  line-height: 1.5;
 }
 .badge__actions { display: flex; gap: 4px; flex-shrink: 0; }
 
@@ -368,21 +369,37 @@ a { color: inherit; text-decoration: none; }
 .passwrap { display: flex; gap: 6px; align-items: center; }
 .passwrap input { flex: 1; }
 
-.swatches { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px; }
+.swatches { display: flex; flex-wrap: wrap; gap: 9px; padding-top: 4px; }
 .swatch { cursor: pointer; }
 .swatch input { position: absolute; opacity: 0; width: 0; height: 0; }
 .swatch__dot {
-  display: block; width: 24px; height: 24px; border-radius: 50%;
-  background: var(--sw);
+  display: block; width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--sw-from), var(--sw-to));
   border: 2px solid transparent;
   box-shadow: inset 0 0 0 2px var(--surface);
 }
 .swatch input:checked + .swatch__dot { border-color: var(--text); }
 
+.cat-picker { display: flex; flex-wrap: wrap; gap: 7px; padding-top: 2px; }
+.cat-pick {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.cat-pick:hover { border-color: var(--accent); color: var(--text); }
+.cat-pick--active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.cat-picker__note { font-size: 11px; color: var(--text-faint); margin-top: 6px; }
+
 .logo-field { display: flex; align-items: center; gap: 10px; padding-top: 2px; }
 .logo-field .btn { margin-top: 0; }
 .logo-field__preview {
-  width: 46px; height: 46px;
+  width: 64px; height: 64px;
   flex-shrink: 0;
   border-radius: var(--radius-sm);
   overflow: hidden;
@@ -391,7 +408,7 @@ a { color: inherit; text-decoration: none; }
   display: flex; align-items: center; justify-content: center;
 }
 .logo-field__preview img { width: 100%; height: 100%; object-fit: contain; }
-.logo-field__ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #fff; }
+.logo-field__ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 17px; color: #fff; }
 .logo-field__upload { cursor: pointer; }
 
 .confirm {
@@ -415,10 +432,13 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--text);
   color: var(--bg);
   padding: 12px 20px;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   box-shadow: 0 12px 30px rgba(23, 41, 31, 0.22);
+  max-width: min(460px, calc(100vw - 32px));
+  word-break: break-word;
+  line-height: 1.45;
 }
 .toast--error { background: var(--red); border-color: var(--red); color: #fff; }
 
@@ -503,9 +523,25 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 (function () {
   'use strict';
 
-  var CATEGORIES = ['Банк', 'Бизнес', 'Автокредит', 'Ипотека', 'Лизинг', 'МФО', 'Краудплатформа', 'Инвестор', 'КПК', 'Ипотека Застройщики', 'Источники', 'Страховка'];
+  var CATEGORIES = [
+    'КПЗН ФЛ', 'КПЗН ЮЛ', 'КПЗА ФЛ', 'КПЗА ЮЛ', 'МФО ЮЛ', 'БК Без Залога', 'Потреб ФЛ',
+    'КПК', 'Инвестор', 'Лизинг', 'Застройщики', 'Ипотека', 'Автокредит', 'Риэлторы', 'Контакты', 'Страховка', 'Доступ'
+  ];
 
-  var PALETTE = ['#8A6324', '#276B60', '#3E4F8F', '#8A3D4E', '#516B33', '#5C4177', '#2C5A6E', '#75551F', '#2F7359', '#684D8F', '#4E3568', '#33508F'];
+  var PALETTE = [
+    ['#6B2FBF', '#C22FA8'],
+    ['#1E5FCC', '#0C837C'],
+    ['#BB5216', '#C4262E'],
+    ['#0C7C52', '#377F21'],
+    ['#3B2F9E', '#7B3FCC'],
+    ['#C2295F', '#B25B15'],
+    ['#0D8179', '#1E5FCC'],
+    ['#7B2FA8', '#D62E7A'],
+    ['#A81E3D', '#CD401D'],
+    ['#1E3A8F', '#6B2FBF'],
+    ['#0E6B3E', '#0D8179'],
+    ['#A6650D', '#A81E3D']
+  ];
 
   var SEED_DATA = [];
 
@@ -585,7 +621,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     if (storageMode === 'claude') {
       window.storage.get(STORAGE_KEY, false).then(function (res) {
         if (res && res.value) {
-          try { banks = JSON.parse(res.value); } catch (e) { banks = SEED_DATA.slice(); }
+          try { banks = JSON.parse(res.value).map(normalizeBank); } catch (e) { banks = SEED_DATA.slice(); }
         } else {
           banks = SEED_DATA.slice();
           window.storage.set(STORAGE_KEY, JSON.stringify(banks), false)['catch'](function () {});
@@ -602,7 +638,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       var raw = null;
       try { raw = window.localStorage.getItem(STORAGE_KEY); } catch (e) {}
       if (raw) {
-        try { banks = JSON.parse(raw); } catch (e) { banks = SEED_DATA.slice(); }
+        try { banks = JSON.parse(raw).map(normalizeBank); } catch (e) { banks = SEED_DATA.slice(); }
       } else {
         banks = SEED_DATA.slice();
         try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(banks)); } catch (e) {}
@@ -685,7 +721,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     }).then(function (res) {
       if (res.status === 404) return { found: false };
       if (res.status === 401) { var e = new Error('unauthorized'); e.code = 401; throw e; }
-      if (!res.ok) throw new Error('proxy-download ' + res.status);
+      if (!res.ok) {
+        return res.text().then(function (bodyText) {
+          throw new Error('HTTP ' + res.status + (bodyText ? ': ' + bodyText.slice(0, 180) : ''));
+        }, function () { throw new Error('HTTP ' + res.status); });
+      }
       return res.json().then(function (data) { return { found: true, data: data }; });
     });
   }
@@ -696,10 +736,14 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       body: JSON.stringify(banksData)
     }).then(function (res) {
       if (res.status === 401) { var e = new Error('unauthorized'); e.code = 401; throw e; }
-      if (!res.ok) throw new Error('proxy-upload ' + res.status);
+      if (!res.ok) {
+        return res.text().then(function (bodyText) {
+          throw new Error('HTTP ' + res.status + (bodyText ? ': ' + bodyText.slice(0, 180) : ''));
+        }, function () { throw new Error('HTTP ' + res.status); });
+      }
       return res.json();
     }).then(function (result) {
-      if (!result || !result.ok) throw new Error('proxy-upload-failed');
+      if (!result || !result.ok) throw new Error('сервер ответил, но не подтвердил сохранение');
       return true;
     });
   }
@@ -731,7 +775,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     })['catch'](function (err) {
       if (err && err.code === 401) { handleYandexAuthError(); return; }
       setSyncState('error');
-      toast('Не удалось связаться с Яндекс.Диском', 'error');
+      toast('Ошибка синхронизации — ' + ((err && err.message) || 'неизвестная причина'), 'error', 9000);
     });
   }
 
@@ -743,7 +787,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     })['catch'](function (err) {
       if (err && err.code === 401) { handleYandexAuthError(); return; }
       setSyncState('error');
-      toast('Сохранено локально, но не на Яндекс.Диск', 'error');
+      toast('Сохранено локально, но не на Диск — ' + ((err && err.message) || 'неизвестная причина'), 'error', 9000);
     });
   }
 
@@ -788,7 +832,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   // ---------- pills ----------
   function renderPills() {
     var counts = {};
-    banks.forEach(function (b) { counts[b.category] = (counts[b.category] || 0) + 1; });
+    banks.forEach(function (b) {
+      (b.categories || []).forEach(function (c) { counts[c] = (counts[c] || 0) + 1; });
+    });
     var all = ['Все'].concat(CATEGORIES);
     var html = all.map(function (cat) {
       var count = cat === 'Все' ? banks.length : (counts[cat] || 0);
@@ -801,7 +847,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   // ---------- cards ----------
   function matchesQuery(bank, q) {
     if (!q) return true;
-    var pieces = [bank.name, bank.cabinet, bank.login, bank.notes];
+    var pieces = [bank.name, bank.cabinet, bank.login, bank.notes].concat(bank.categories || []);
     (bank.contacts || []).forEach(function (c) { pieces.push(c.name, c.phone, c.email, c.telegram); });
     (bank.fields || []).forEach(function (f) { pieces.push(f.label, f.value); });
     var hay = pieces.filter(Boolean).join(' ').toLowerCase();
@@ -811,7 +857,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   function renderCards() {
     var q = query.trim().toLowerCase();
     var list = banks.filter(function (b) {
-      if (activeCategory !== 'Все' && b.category !== activeCategory) return false;
+      if (activeCategory !== 'Все' && (b.categories || []).indexOf(activeCategory) === -1) return false;
       return matchesQuery(b, q);
     });
 
@@ -904,15 +950,17 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     if (bank.logo) {
       return '<div class="badge__medal badge__medal--logo"><img src="' + esc(bank.logo) + '" alt=""></div>';
     }
-    return '<div class="badge__medal" style="background:' + esc(bank.color) + '">' + esc(initials(bank.name)) + '</div>';
+    var bg = bank.colorTo ? ('linear-gradient(135deg, ' + esc(bank.color) + ', ' + esc(bank.colorTo) + ')') : esc(bank.color);
+    return '<div class="badge__medal" style="background:' + bg + '">' + esc(initials(bank.name)) + '</div>';
   }
 
   function cardHtml(bank) {
     var cts = (bank.contacts || []).map(function (c, i) { return contactHtml(bank, c, i); }).join('');
+    var catText = (bank.categories || []).join(' · ');
     return '<article class="badge">' +
       '<div class="badge__top">' +
       medalHtml(bank) +
-      '<div class="badge__headtext"><div class="badge__name">' + esc(bank.name) + '</div><div class="badge__cat">' + esc(bank.category) + '</div></div>' +
+      '<div class="badge__headtext"><div class="badge__name">' + esc(bank.name) + '</div><div class="badge__cat">' + esc(catText) + '</div></div>' +
       '<div class="badge__actions">' +
       '<button class="iconbtn" data-action="edit" data-bank="' + bank.id + '" type="button" title="Изменить">' + icon('edit') + '</button>' +
       '<button class="iconbtn iconbtn--danger" data-action="delete" data-bank="' + bank.id + '" type="button" title="Удалить">' + icon('trash') + '</button>' +
@@ -923,8 +971,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   }
 
   // ---------- modal ----------
+  function randomPaletteColor() {
+    return PALETTE[Math.floor(Math.random() * PALETTE.length)];
+  }
+
   function emptyBank() {
-    return { id: uid(), name: '', category: 'Банк', color: PALETTE[Math.floor(Math.random() * PALETTE.length)], contacts: [{ id: uid(), name: '', phone: '', email: '', telegram: '' }], cabinet: '', login: '', password: '', fields: [], notes: '', logo: '' };
+    var c = randomPaletteColor();
+    return { id: uid(), name: '', categories: [], color: c[0], colorTo: c[1], contacts: [{ id: uid(), name: '', phone: '', email: '', telegram: '' }], cabinet: '', login: '', password: '', fields: [], notes: '', logo: '' };
   }
 
   function contactFormRow(c) {
@@ -958,13 +1011,21 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     var b = bank || emptyBank();
 
     pendingLogo = b.logo || '';
-    logoPlaceholderHtml = '<span class="logo-field__ph" style="background:' + esc(b.color) + '">' + esc(initials(b.name)) + '</span>';
+    logoPlaceholderHtml = '<span class="logo-field__ph" style="background:' + (b.colorTo ? ('linear-gradient(135deg, ' + esc(b.color) + ', ' + esc(b.colorTo) + ')') : esc(b.color)) + '">' + esc(initials(b.name)) + '</span>';
 
     var contactsHtml = b.contacts.map(contactFormRow).join('');
     var fieldsHtmlStr = (b.fields || []).map(fieldFormRow).join('');
-    var catOptions = CATEGORIES.map(function (c) { return '<option value="' + esc(c) + '"' + (c === b.category ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('');
-    var swatches = PALETTE.map(function (hex) {
-      return '<label class="swatch" style="--sw:' + hex + '"><input type="radio" name="color" value="' + hex + '"' + (hex === b.color ? ' checked' : '') + '><span class="swatch__dot"></span></label>';
+    var bankCats = b.categories || [];
+    var extraCats = bankCats.filter(function (c) { return CATEGORIES.indexOf(c) === -1; });
+    var catPicker = '<div class="cat-picker" id="catPicker">' + CATEGORIES.concat(extraCats).map(function (c) {
+      var active = bankCats.indexOf(c) !== -1;
+      return '<button type="button" class="cat-pick' + (active ? ' cat-pick--active' : '') + '" data-action="toggle-cat" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
+    }).join('') + '</div>' +
+      (extraCats.length ? '<div class="cat-picker__note">Старые категории — можно оставить или убрать</div>' : '');
+    var swatches = PALETTE.map(function (pair) {
+      var val = pair[0] + '|' + pair[1];
+      var checked = (b.color === pair[0] && b.colorTo === pair[1]) ? ' checked' : '';
+      return '<label class="swatch" style="--sw-from:' + pair[0] + ';--sw-to:' + pair[1] + '"><input type="radio" name="color" value="' + val + '"' + checked + '><span class="swatch__dot"></span></label>';
     }).join('');
     var logoPreviewInner = pendingLogo ? ('<img src="' + esc(pendingLogo) + '" alt="">') : logoPlaceholderHtml;
     var logoBlock = '<div class="field"><label>Логотип</label><div class="logo-field">' +
@@ -979,10 +1040,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       '<button class="iconbtn" data-action="close-modal" type="button">' + icon('close') + '</button></div>' +
       '<div class="modal__body">' +
       '<div class="field"><label>Название банка</label><input id="f-name" type="text" value="' + esc(b.name) + '" placeholder="Например, Совкомбанк"></div>' +
-      '<div class="field-row">' +
-      '<div class="field"><label>Категория</label><select id="f-category">' + catOptions + '</select></div>' +
+      '<div class="field"><label>Категории (можно несколько)</label>' + catPicker + '</div>' +
       '<div class="field"><label>Метка</label><div class="swatches">' + swatches + '</div></div>' +
-      '</div>' +
       logoBlock +
       '<div class="field"><label>Контакты</label><div id="contactsList">' + contactsHtml + '</div>' +
       '<button class="btn btn--ghost btn--sm" data-action="add-contact" type="button">' + icon('plus') + ' Добавить контакт</button></div>' +
@@ -1046,9 +1105,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
     var name = document.getElementById('f-name').value.trim();
     if (!name) { toast('Укажите название банка', 'error'); document.getElementById('f-name').focus(); return; }
 
-    var category = document.getElementById('f-category').value;
+    var categories = Array.prototype.map.call(document.querySelectorAll('#catPicker .cat-pick--active'), function (el) { return el.getAttribute('data-cat'); });
     var colorInput = document.querySelector('input[name="color"]:checked');
-    var color = colorInput ? colorInput.value : PALETTE[0];
+    var colorPair = (colorInput ? colorInput.value : (PALETTE[0][0] + '|' + PALETTE[0][1])).split('|');
+    var color = colorPair[0];
+    var colorTo = colorPair[1] || '';
     var cabinet = document.getElementById('f-cabinet').value.trim();
     var login = document.getElementById('f-login').value.trim();
     var password = document.getElementById('f-password').value;
@@ -1072,7 +1133,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
       if (f.label || f.value) fields.push(f);
     });
 
-    var bankObj = { id: id, name: name, category: category, color: color, contacts: contacts, cabinet: cabinet, login: login, password: password, fields: fields, notes: notes, logo: pendingLogo };
+    var bankObj = { id: id, name: name, categories: categories, color: color, colorTo: colorTo, contacts: contacts, cabinet: cabinet, login: login, password: password, fields: fields, notes: notes, logo: pendingLogo };
 
     var idx = -1;
     for (var i = 0; i < banks.length; i++) { if (banks[i].id === id) { idx = i; break; } }
@@ -1140,11 +1201,20 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 
   function normalizeBank(raw) {
     raw = raw || {};
+    var cats;
+    if (Array.isArray(raw.categories)) {
+      cats = raw.categories.filter(function (c) { return typeof c === 'string' && c; });
+    } else if (typeof raw.category === 'string' && raw.category) {
+      cats = [raw.category];
+    } else {
+      cats = [];
+    }
     return {
       id: raw.id || uid(),
       name: raw.name || '',
-      category: CATEGORIES.indexOf(raw.category) !== -1 ? raw.category : 'Банк',
-      color: raw.color || PALETTE[0],
+      categories: cats,
+      color: raw.color || PALETTE[0][0],
+      colorTo: raw.colorTo || '',
       logo: raw.logo || '',
       contacts: Array.isArray(raw.contacts) ? raw.contacts.map(function (c) {
         c = c || {};
@@ -1289,6 +1359,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
         return;
       }
       if (action === 'remove-field') { actionEl.closest('.field-row-item').remove(); return; }
+      if (action === 'toggle-cat') { actionEl.classList.toggle('cat-pick--active'); return; }
       if (action === 'remove-logo') { pendingLogo = ''; updateLogoPreview(); return; }
       if (action === 'cancel-delete') { closeConfirm(); return; }
       if (action === 'confirm-delete') { performDelete(actionEl.getAttribute('data-bank')); return; }
@@ -1333,7 +1404,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
         var file = t.files && t.files[0];
         if (!file) return;
         if (!/^image\//.test(file.type)) { toast('Нужен файл изображения', 'error'); t.value = ''; return; }
-        readAndResizeImage(file, 160, function (dataUrl) {
+        readAndResizeImage(file, 320, function (dataUrl) {
           if (!dataUrl) { toast('Не удалось загрузить логотип', 'error'); return; }
           pendingLogo = dataUrl;
           updateLogoPreview();
